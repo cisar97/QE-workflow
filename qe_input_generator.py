@@ -33,7 +33,13 @@ def get_atoms_from_file(file_name, config, convert_to_bohr=True):
     # config : numpy array of config index
     # return list of array, each the cordinates of the atoms at given config
     Atomic_pos = []
-    if np.shape(config)[0] != 1 :
+    if not isinstance(config, list):
+        atom = read(file_name, index=config)
+        at_pos = atom.get_positions()
+        if convert_to_bohr:
+            at_pos *= 1.8897259886
+        Atomic_pos.append(at_pos)
+    else :
         atoms = read(file_name, index=f"{config[0]}:{config[-1]+1}")
         for i in config :
             atom = atoms[i-config[0]]
@@ -41,12 +47,6 @@ def get_atoms_from_file(file_name, config, convert_to_bohr=True):
             if convert_to_bohr:
                 at_pos *= 1.8897259886
             Atomic_pos.append(at_pos)
-    else :
-        atom = read(file_name, index=config[0])
-        at_pos = atom.get_positions()
-        if convert_to_bohr:
-            at_pos *= 1.8897259886
-        Atomic_pos.append(at_pos)
     return Atomic_pos
 
 def get_atoms_random(nat, celldm, seed): 
@@ -143,7 +143,7 @@ def build_qe_input(calculation, prefix, celldm1, ecutwfc, ecutrho, pseudo, atomi
         "ATOMIC_SPECIES" : f"{atom}  {mass:.3f}  {pseudo}",
         "ATOMIC_POSITIONS" : {
             'length_metric' : length_metric,
-            'atomic_pos' : atomic_pos
+            'atomic_pos' : atomic_pos[0]
         },
         "K_POINTS" : {
             'kpoints_name' : kpoints_name,
