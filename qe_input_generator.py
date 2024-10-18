@@ -51,9 +51,11 @@ def get_atoms_from_file(file_name, config, convert_to_bohr=True):
 
 def get_atoms_random(nat, celldm, seed): 
     # Generate random atomic positions in a cubic cell of length celldm
+    # Output a list with one array to be consistent with the list outputted
+    # by get_atoms_from_file
     np.random.seed(seed)
     atomic_pos = np.random.uniform(0., celldm, (nat,3))
-    return atomic_pos
+    return [atomic_pos]
 
 def electronic_temp(T, kB=8.617333e-5, ry_to_ev=13.605698) : 
     # Compute degauss paramemtr for smearing corresponding 
