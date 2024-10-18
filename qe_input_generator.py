@@ -31,7 +31,7 @@ def get_atoms_from_file(file_name, config, convert_to_bohr=True):
     # Read atomic positions from a file and save them in a numpy array
     # Default is to convert the positions from Angstrom to Bohr
     # config : numpy array of config index
-    # return list of array, each the cordinates of the atoms at given config
+    # return list of numpy arrays of shape [nat,3], in case of one config asked output a list of 1 elementt
     Atomic_pos = []
     if not isinstance(config, list):
         atom = read(file_name, index=config)
@@ -51,11 +51,10 @@ def get_atoms_from_file(file_name, config, convert_to_bohr=True):
 
 def get_atoms_random(nat, celldm, seed): 
     # Generate random atomic positions in a cubic cell of length celldm
-    # Output a list with one array to be consistent with the list outputted
-    # by get_atoms_from_file
+    # Output : numpy array of dim [nat,3]
     np.random.seed(seed)
     atomic_pos = np.random.uniform(0., celldm, (nat,3))
-    return [atomic_pos]
+    return atomic_pos
 
 def electronic_temp(T, kB=8.617333e-5, ry_to_ev=13.605698) : 
     # Compute degauss paramemtr for smearing corresponding 
@@ -145,7 +144,7 @@ def build_qe_input(calculation, prefix, celldm1, ecutwfc, ecutrho, pseudo, atomi
         "ATOMIC_SPECIES" : f"{atom}  {mass:.3f}  {pseudo}",
         "ATOMIC_POSITIONS" : {
             'length_metric' : length_metric,
-            'atomic_pos' : atomic_pos[0]
+            'atomic_pos' : atomic_pos
         },
         "K_POINTS" : {
             'kpoints_name' : kpoints_name,
