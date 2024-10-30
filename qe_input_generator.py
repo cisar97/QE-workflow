@@ -84,14 +84,17 @@ def write_qe_input(qe_input, atom, file_name):
         else : 
             print(f"\n{Key}", file=f)
             for keys, value in qe_input[Key].items():
-                print(f"{keys} = {value}", file=f)
+                if value == None : 
+                    continue 
+                else :
+                    print(f"{keys} = {value}", file=f)
             print(f"/", file=f)
     f.close()
 
 
 def build_qe_input(calculation, prefix, celldm1, ecutwfc, ecutrho, pseudo, atomic_pos, file_name, nstep=1000 , dt=10,
                    Temp='1000', thermo='svr', restart_mode='from_scratch', pseudo_dir='/users/ccozza/pseudo', outdir='./',  
-                   tpstress='.true.', tprnfor='.true.', ibrav=1,  nat=128, ntyp=1, occupations='smearing', 
+                   tpstress='.true.', tprnfor='.true.', ibrav=1,  nat=128, ntyp=1, nbnd=None, occupations='smearing', 
                    smearing='gaussian', degauss=0.002, input_dft='pbe', conv_thr=1.0e-6, ndim=8, beta=0.7, diagonalization='david',
                    ion_dynamics='verlet', ion_temperature='svr', nraise=1, refold_pos='.false.', atom='H', 
                    mass=1.000, kpoints_name='automatic', kpoints='3 3 3 1 1 1', length_metric='bohr') :
@@ -120,6 +123,7 @@ def build_qe_input(calculation, prefix, celldm1, ecutwfc, ecutrho, pseudo, atomi
             "celldm(1)" : celldm1,
             "nat" : nat,
             "ntyp" : ntyp,
+            "nbnd" : nbnd,
             "ecutwfc" : ecutwfc,
             "ecutrho" : ecutrho,
             "occupations" : f"'{occupations}'",
