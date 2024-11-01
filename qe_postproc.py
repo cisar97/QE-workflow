@@ -102,6 +102,9 @@ def binning(file, energy_col, press_col, iter_col, bin_len, init_step) :
 def rs_to_gcm3(rs):
     return np.round(2.6960431 / rs**3, 1)
 
+def gcm3_to_rs(rho):
+    return np.round((2.6960431 / rho)**(1/3), 3)
+
 
 def RDF(config, startFrame, stopFrame, rmax, nbins) :
     ## Provide the g(r) of a given MD 
