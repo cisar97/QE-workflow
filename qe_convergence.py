@@ -24,7 +24,7 @@ def write_dataset_atom(project_dir, MDfile, T, rho, config, qe_input_dir_name="d
     for i, atom in enumerate(atoms) :
         write(f"{project_dir}/dataset/input_T{T}_d{rs}_{config[i]}.xsf", atom)
 
-def genrate_distorted_configurations(project_dir, qe_input_dir_name="dataset", rs_pm_list=[-0.05, -0.02, -0.01, 0.00, +0.01, +0.02, +0.05], indshift=0) :
+def generate_distorted_configurations(project_dir, qe_input_dir_name="dataset", rs_pm_list=[-0.05, -0.02, -0.01, 0.00, +0.01, +0.02, +0.05], indshift=0) :
     ## Generate a set of distorted atomic configurations from the atomic configurations
     ## stored in the /dataset directory. The distorted configurations are stored in the 
     ## qe_input_dir directory.
