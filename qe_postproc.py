@@ -106,6 +106,9 @@ def gcm3_to_rs(rho):
     return np.round((2.6960431 / rho)**(1/3), 3)
 
 
+from ase.io import read
+from ase.geometry.analysis import Analysis
+
 def RDF(config, startFrame, stopFrame, rmax, nbins) :
     ## Provide the g(r) of a given MD 
     ## config: list of configurations (from ase read)
@@ -136,7 +139,6 @@ def RDF(config, startFrame, stopFrame, rmax, nbins) :
 ##              QE output reader
 ##-----------------------------------------------------------------------
 
-from ase.io import read
 from ase.units import Ry, GPa, Bohr
 from ase import Atoms
 
