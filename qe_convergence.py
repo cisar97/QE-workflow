@@ -6,12 +6,13 @@ from qe_postproc import gcm3_to_rs
 import os, glob, re, shutil
 import numpy as np 
 from ase.io import read, write 
+from ase import Atoms
 
 ang_to_bohr = 0.5291772109 # used in turbo.
 amu_to_g = 1.660539066 * 10**(-27)
 ang_to_cm = 10**(-8)
 
-def write_dataset_atom(project_dir, MDfile, T, rho, config, qe_input_dir_name="dataset",) : 
+def write_dataset_atom(project_dir, MDfile, T, rho, config, qe_input_dir_name="dataset") : 
     ## Inside the home directory provided as input create a /dataset directory 
     ## containing the atomic configurations extracted from the MD trajectory
     ## provided as input. The atomic configurations are stored as .xsf files
@@ -20,8 +21,9 @@ def write_dataset_atom(project_dir, MDfile, T, rho, config, qe_input_dir_name="d
     # config : LIST of configurations to extract from the MD trajectory
     os.makedirs(f"{project_dir}/{qe_input_dir_name}", exist_ok=True)
     rs = gcm3_to_rs(rho)
-    atoms = get_atoms_from_file(MDfile, config)
-    for i, atom in enumerate(atoms) :
+    positions = get_atoms_from_file(MDfile, config)
+    for i, pos in enumerate(positions) :
+        atom = Atoms('H128', positions=pos)
         write(f"{project_dir}/dataset/input_T{T}_d{rs}_{config[i]}.xsf", atom)
 
 def generate_distorted_configurations(project_dir, qe_input_dir_name="dataset", rs_pm_list=[-0.05, -0.02, -0.01, 0.00, +0.01, +0.02, +0.05], indshift=0) :
