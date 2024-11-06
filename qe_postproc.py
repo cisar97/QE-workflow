@@ -103,7 +103,7 @@ def rs_to_gcm3(rs):
     return np.round(2.6960431 / rs**3, 1)
 
 def gcm3_to_rs(rho):
-    return np.round((2.6960431 / rho)**(1/3), 3)
+    return np.round((2.6960431 / rho)**(1/3), 4)
 
 
 from ase.io import read
