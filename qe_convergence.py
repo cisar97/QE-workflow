@@ -79,12 +79,18 @@ def generate_distorted_configurations(project_dir, qe_input_dir_name="dataset", 
             write(os.path.join(s_ind_dir, rs_fname), s_atoms)
 
 
-from ase.calculators.espresso import Espresso
-def compute_qe_distorted_conf(project_dir, scratch_dir, xc_name, pp_prefix, pp, ecutwfc, pseudo_NC=True, kpts=(3,3,3),koffset=(1,1,1),
-                              rs_tasks=1.310, struct_dir_name="struct_input_dir", qe_input_dir_name="dataset"):  
-    pseudopotentials = {'H':pp}
-    if pseudo_NC==True : ecutrho = 4*ecutwfc
-    os.change_dir(project_dir)
+from ase.calculators.espresso import Espresso, EspressoProfile
+
+def compute_qe_distorted_conf(project_dir, ase_espresso_calculator, xc_name, pp_prefix, ecutwfc, struct_dir_name="struct_input_dir", qe_input_dir_name="dataset", scratch_dir=None ):  
+    ## From the distorted structures in struct_dir_name create the espresso input file and compute.
+    ## project_dir: Working directory 
+    ## ase_espresso_calculator: QuantumESPRESSO calculator object in ASE
+    ## xc_name: Exc functional name string to be used in the folder name  
+    ## pp_prefix: Pseudopotential name string to be used in the folder name 
+    ## ecutwfc: Wavefunction cutoff to be used in the filder name. The cutoff for the calcutor needs to be specified outside
+    ## scratch_dir: SCRATCH directory for QE in case the QE flag 'dik_io' is NOT set to 'none'.  
+
+    os.chdir(project_dir)
     os.makedirs(scratch_dir, exist_ok=True)
     struct_dir=os.path.join(project_dir, struct_dir_name)
     qe_results_dir=os.path.join(project_dir, f"qe_results_xc_{xc_name}_pp_{pp_prefix}_ecutw_{ecutwfc}_dir")
@@ -105,13 +111,6 @@ def compute_qe_distorted_conf(project_dir, scratch_dir, xc_name, pp_prefix, pp, 
             shutil.copyfile(os.path.join(xsf_file), os.path.join(qe_work_dir, xsf_filename))
             os.chdir(qe_work_dir)
 
-            if float(rs_label) >= rs_tasks :
-                tasks = 64
-            else :
-                tasks = 48
-
-            #ASE_ESPRESSO_COMMAND
-            os.environ["ASE_ESPRESSO_COMMAND"]=f"srun -n {tasks} pw.x < PREFIX.pwi > PREFIX.pwo"
             # read atoms
             try:
                 test_atoms=read(os.path.join(qe_work_dir, "espresso.pwo"), format="espresso-out")
@@ -122,38 +121,8 @@ def compute_qe_distorted_conf(project_dir, scratch_dir, xc_name, pp_prefix, pp, 
                 continue
             except:
                 print(f"{struct_dirname}, rs_index={rs_index} is not done. compute.", flush=True)
-
-            # start qe calc.
-            qe_input_data = {
-                'control': {
-                    'calculation' : 'scf',
-                    'pseudo_dir' : '/users/ccozza/pseudo',
-                    'verbosity' : 'high',
-                    'disk_io' : 'none',
-                    'outdir' : './' #qe_work_dir
-                    },
-                'system': {
-                    'ecutwfc': ecutwfc,
-                    'ecutrho': ecutrho,
-                    'occupations' : 'smearing',
-                    'degauss': 2.0e-3,
-                    'input_dft': xc_name,
-                    },
-                'electrons':{
-                    'conv_thr': 1.0e-6,
-                    'electron_maxstep': 200,
-                    'diagonalization': 'david',
-                    }
-                }
-
-            qe_calc = Espresso(pseudopotentials=pseudopotentials,
-                            tstress=True, tprnfor=True,
-                            input_data=qe_input_data,
-                            kpts=kpts, koffset=koffset)
-
-            atoms.calc=qe_calc
+                        atoms.calc=ase_espresso_calculator
+            
             atoms.get_potential_energy()
 
             os.chdir(project_dir)
-
-        #break # for test
