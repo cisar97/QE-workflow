@@ -99,11 +99,11 @@ def binning(file, energy_col, press_col, iter_col, bin_len, init_step) :
     return(mean_en, err_en, mean_pr, err_pr, nbin)
 
 
-def rs_to_gcm3(rs):
-    return np.round(2.6960431 / rs**3, 1)
+def rs_to_gcm3(rs, rounded=1):
+    return np.round(2.6960431 / rs**3, rounded)
 
-def gcm3_to_rs(rho):
-    return np.round((2.6960431 / rho)**(1/3), 4)
+def gcm3_to_rs(rho, rounded=4):
+    return np.round((2.6960431 / rho)**(1/3), rounded)
 
 
 from ase.io import read
